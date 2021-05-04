@@ -81,7 +81,7 @@ class MatterJSMediator {
 			length = 200,
 			width = 25;
 
-		//左腕
+		//右腕
 		const rightArm = this.Composites.stack(350, 120, 2, 1, -20, 0, (x, y) => {
 			return this.Bodies.rectangle(x, y, length, width, {
 				collisionFilter: {
