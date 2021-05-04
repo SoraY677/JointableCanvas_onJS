@@ -77,49 +77,59 @@ class MatterJSMediator {
 	 */
 	getJointMan() {
 
-		var group = this.Body.nextGroup(true),
-			length = 200,
-			width = 25;
+		var group = this.Body.nextGroup(true)
 
-		//右腕
-		const rightArm = this.Composites.stack(350, 120, 2, 1, -20, 0, (x, y) => {
-			return this.Bodies.rectangle(x, y, length, width, {
-				collisionFilter: {
-					group: group
-				},
-				frictionAir: 0,
-				chamfer: 5,
+		//ルールに従い、パーツを形成
+		const getBodyParts = (x, y, num, length, width) => {
+			const parts = this.Composites.stack(x, y, num, 1, -20, 0, (x, y) => {
+				return this.Bodies.rectangle(x, y, length, width, {
+					collisionFilter: {
+						group: group
+					},
+					frictionAir: 0,
+					chamfer: 5,
+					render: {
+						fillStyle: 'transparent',
+						lineWidth: 1
+					}
+				});
+			});
+
+			this.Composites.chain(parts, 0.45, 0, -0.45, 0, {
+				stiffness: 0.9,
+				length: 10,
+				angularStiffness: 0.7,
 				render: {
-					fillStyle: 'transparent',
-					lineWidth: 1
+					strokeStyle: '#4a485b'
 				}
 			});
-		});
-		this.Composites.chain(rightArm, 0.45, 0, -0.45, 0, {
-			stiffness: 0.9,
-			length: 0,
-			angularStiffness: 0.7,
-			render: {
-				strokeStyle: '#4a485b'
-			}
-		});
 
-		this.Composite.add(rightArm, this.Constraint.create({
-			bodyB: rightArm.bodies[0],
-			pointB: {
-				x: -length * 0.42,
-				y: 0
-			},
-			pointA: {
-				x: rightArm.bodies[0].position.x - length * 0.42,
-				y: rightArm.bodies[0].position.y
-			},
-			stiffness: 0.9,
-			length: 0,
-			render: {
-				strokeStyle: '#4a485b'
-			}
-		}));
+			this.Composite.add(parts, this.Constraint.create({
+				bodyB: parts.bodies[0],
+				pointB: {
+					x: -length * 0.42,
+					y: 0
+				},
+				pointA: {
+					x: parts.bodies[0].position.x - length * 0.42,
+					y: parts.bodies[0].position.y
+				},
+				stiffness: 0.9,
+				length: 0,
+				render: {
+					strokeStyle: '#4a485b'
+				}
+			}));
+
+			return parts
+		}
+
+		const rightArm = getBodyParts(350, 120, 2, 180, 50)
+
+
+
+
+
 		return [
 			rightArm
 
