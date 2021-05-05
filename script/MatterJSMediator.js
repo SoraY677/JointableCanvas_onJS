@@ -21,13 +21,19 @@ class MatterJSMediator {
 	constructor() {
 
 		// create an engine
+		const canvas = document.getElementById("main_canvas")
 		let engine = this.Engine.create()
 		let world = engine.world
 
 		// create a renderer
 		let render = this.Render.create({
 			element: document.body,
-			engine: engine
+			engine: engine,
+			options: {
+				wireframes: false, //ワイヤーフレームモードをオフ
+				showAngleIndicator: false,
+				background: 'transparent'
+			}
 		});
 
 		// マウスコントロールのセッティング
@@ -83,6 +89,10 @@ class MatterJSMediator {
 			collisionFilter: {
 				group: group
 			},
+			render: {
+				fillStyle: '#00B06B',
+				lineWidth: 1
+			}
 		})
 		const body = this.createBodyComposite(240, 205, 100, 160, [30, 30, 30, 30], group)
 		const rightArm = this.createJointComposite(300, 200, 30, 100, [15, 15, 15, 15], group)
@@ -92,6 +102,16 @@ class MatterJSMediator {
 		return [head, body, rightArm, leftArm, rightLeg, leftLeg]
 	}
 
+	/**
+	 * 
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} w 
+	 * @param {*} h 
+	 * @param {*} radius 
+	 * @param {*} group 
+	 * @returns 
+	 */
 	createBodyComposite(x, y, w, h, radius, group) {
 		const part = this.Bodies.rectangle(x, y, w, h, {
 			collisionFilter: {
@@ -102,7 +122,7 @@ class MatterJSMediator {
 			},
 			frictionAir: 1,
 			render: {
-				fillStyle: 'transparent',
+				fillStyle: '#00B06B',
 				lineWidth: 1
 			}
 		})
@@ -124,6 +144,7 @@ class MatterJSMediator {
 			stiffness: 1,
 			length: 0.1,
 			render: {
+				fillStyle: '#00B06B',
 				strokeStyle: '#4a485b'
 			}
 		}))
@@ -141,7 +162,7 @@ class MatterJSMediator {
 			},
 			frictionAir: 1,
 			render: {
-				fillStyle: 'transparent',
+				fillStyle: '#00B06B',
 				lineWidth: 1
 			}
 		})
@@ -155,7 +176,7 @@ class MatterJSMediator {
 			},
 			frictionAir: 0.2,
 			render: {
-				fillStyle: 'transparent',
+				fillStyle: '#00B06B',
 				lineWidth: 1
 			}
 		})
