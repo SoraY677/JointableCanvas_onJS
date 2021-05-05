@@ -113,12 +113,38 @@ class MatterJSMediator {
 	 * @returns 
 	 */
 	createBodyComposite(x, y, w, h, radius, group) {
-		const part = this.Bodies.rectangle(x, y, w, h, {
+		const part1 = this.Bodies.rectangle(x, y, w, h / 3, {
 			collisionFilter: {
 				group: group
 			},
 			chamfer: {
-				radius: radius
+				radius: [10, 10, 35, 35]
+			},
+			frictionAir: 1,
+			render: {
+				fillStyle: '#00B06B',
+				lineWidth: 1
+			}
+		})
+		const part2 = this.Bodies.rectangle(x, y, w * 8 / 11, h / 3, {
+			collisionFilter: {
+				group: group
+			},
+			chamfer: {
+				radius: [10, 10, 10, 10]
+			},
+			frictionAir: 1,
+			render: {
+				fillStyle: '#00B06B',
+				lineWidth: 1
+			}
+		})
+		const part3 = this.Bodies.rectangle(x, y, w, h / 3, {
+			collisionFilter: {
+				group: group
+			},
+			chamfer: {
+				radius: [35, 35, 10, 10]
 			},
 			frictionAir: 1,
 			render: {
@@ -129,13 +155,23 @@ class MatterJSMediator {
 
 		//グループ化
 		const composite = this.Composite.create({
-			bodies: [part]
+			bodies: [part1, part2, part3]
+		})
+
+		//結合
+		this.Composites.chain(composite, 0, 0.35, 0, -0.35, {
+			stiffness: 1,
+			length: 1,
+			angularStiffness: 0.2,
+			render: {
+				strokeStyle: '#4a485b'
+			}
 		})
 		this.Composite.add(composite, this.Constraint.create({
 			bodyB: composite.bodies[0],
 			pointB: {
 				x: 0,
-				y: -1 * w / 2
+				y: -1 * w / 6
 			},
 			pointA: {
 				x: composite.bodies[0].position.x - 0.45 * 100,
