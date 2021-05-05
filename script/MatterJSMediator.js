@@ -33,11 +33,11 @@ class MatterJSMediator {
 		// マウスコントロールのセッティング
 		render.mouse = this.getMouseControl(world, engine, render)
 
+		engine.gravity.scale = 0
 		// add all of the bodies to the world
 		const jointMan = this.getJointMan()
+
 		this.Composite.add(engine.world, jointMan);
-
-
 		// run the renderer
 		this.Render.run(render);
 
@@ -76,63 +76,120 @@ class MatterJSMediator {
 	 * @returns {array} 
 	 */
 	getJointMan() {
+		const group = this.Body.nextGroup(true)
 
-		var group = this.Body.nextGroup(true)
+		const head = this.Bodies.circle(195, 120, 40, {
+			isStatic: true,
+			collisionFilter: {
+				group: group
+			},
+		})
+		const body = this.createBodyComposite(240, 205, 100, 160, [30, 30, 30, 30], group)
+		const rightArm = this.createJointComposite(300, 200, 30, 100, [15, 15, 15, 15], group)
+		const leftArm = this.createJointComposite(180, 200, 30, 100, [15, 15, 15, 15], group)
+		const rightLeg = this.createJointComposite(280, 345, 30, 100, [15, 15, 15, 15], group)
+		const leftLeg = this.createJointComposite(200, 340, 30, 100, [15, 15, 15, 15], group)
+		return [head, body, rightArm, leftArm, rightLeg, leftLeg]
+	}
 
-		//ルールに従い、パーツを形成
-		const getBodyParts = (x, y, num, length, width) => {
-			const parts = this.Composites.stack(x, y, num, 1, -20, 0, (x, y) => {
-				return this.Bodies.rectangle(x, y, length, width, {
-					collisionFilter: {
-						group: group
-					},
-					frictionAir: 0,
-					chamfer: 5,
-					render: {
-						fillStyle: 'transparent',
-						lineWidth: 1
-					}
-				});
-			});
+	createBodyComposite(x, y, w, h, radius, group) {
+		const part = this.Bodies.rectangle(x, y, w, h, {
+			collisionFilter: {
+				group: group
+			},
+			chamfer: {
+				radius: radius
+			},
+			frictionAir: 1,
+			render: {
+				fillStyle: 'transparent',
+				lineWidth: 1
+			}
+		})
 
-			this.Composites.chain(parts, 0.45, 0, -0.45, 0, {
-				stiffness: 0.9,
-				length: 10,
-				angularStiffness: 0.7,
-				render: {
-					strokeStyle: '#4a485b'
-				}
-			});
+		//グループ化
+		const composite = this.Composite.create({
+			bodies: [part]
+		})
+		this.Composite.add(composite, this.Constraint.create({
+			bodyB: composite.bodies[0],
+			pointB: {
+				x: 0,
+				y: -1 * w / 2
+			},
+			pointA: {
+				x: composite.bodies[0].position.x - 0.45 * 100,
+				y: composite.bodies[0].position.y
+			},
+			stiffness: 1,
+			length: 0.1,
+			render: {
+				strokeStyle: '#4a485b'
+			}
+		}))
+		return composite
+	}
 
-			this.Composite.add(parts, this.Constraint.create({
-				bodyB: parts.bodies[0],
-				pointB: {
-					x: -length * 0.42,
-					y: 0
-				},
-				pointA: {
-					x: parts.bodies[0].position.x - length * 0.42,
-					y: parts.bodies[0].position.y
-				},
-				stiffness: 0.9,
-				length: 0,
-				render: {
-					strokeStyle: '#4a485b'
-				}
-			}));
+	createJointComposite(x, y, w, h, radius, group) {
+		//第一関節
+		const parts1 = this.Bodies.rectangle(x, y, w, h, {
+			collisionFilter: {
+				group: group
+			},
+			chamfer: {
+				radius: radius
+			},
+			frictionAir: 1,
+			render: {
+				fillStyle: 'transparent',
+				lineWidth: 1
+			}
+		})
+		//第二関節
+		const parts2 = this.Bodies.rectangle(x, y, w, h, {
+			collisionFilter: {
+				group: group
+			},
+			chamfer: {
+				radius: radius
+			},
+			frictionAir: 0.2,
+			render: {
+				fillStyle: 'transparent',
+				lineWidth: 1
+			}
+		})
+		//グループ化
+		const parts = this.Composite.create({
+			bodies: [parts1, parts2]
+		})
+		//結合
+		this.Composites.chain(parts, 0, 0.35, 0, -0.35, {
+			stiffness: 1,
+			length: 1,
+			angularStiffness: 0.2,
+			render: {
+				strokeStyle: '#4a485b'
+			}
+		})
+		//固定化
+		this.Composite.add(parts, this.Constraint.create({
+			bodyB: parts.bodies[0],
+			pointB: {
+				x: 0,
+				y: -1 * h / 2 + 10
+			},
+			pointA: {
+				x: parts.bodies[0].position.x - 0.45 * 100,
+				y: parts.bodies[0].position.y
+			},
+			stiffness: 1,
+			length: 1,
+			render: {
+				strokeStyle: '#4a485b'
+			}
+		}))
 
-			return parts
-		}
-
-		const rightArm = getBodyParts(350, 120, 2, 180, 50)
-
-
-
-
-
-		return [
-			rightArm
-
-		]
+		return parts
 	}
 }
