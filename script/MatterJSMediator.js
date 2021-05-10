@@ -199,7 +199,6 @@ class MatterJSMediator {
 				visible: false
 			}
 		})
-		console.log(this.Composites.chain)
 		//固定化
 		this.Composite.add(parts, this.Constraint.create({
 			bodyB: parts.bodies[0],
