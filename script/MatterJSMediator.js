@@ -84,7 +84,7 @@ class MatterJSMediator {
 	getJointMan() {
 		const group = this.Body.nextGroup(true)
 
-		const head = this.Bodies.circle(195, 120, 40, {
+		const head = this.Bodies.circle(235, 130, 40, {
 			isStatic: true,
 			collisionFilter: {
 				group: group
@@ -94,11 +94,11 @@ class MatterJSMediator {
 				lineWidth: 1
 			}
 		})
-		const body = this.createBodyComposite(240, 205, 100, 160, [30, 30, 30, 30], group)
-		const rightArm = this.createJointComposite(300, 200, 30, 100, [15, 15, 15, 15], group)
-		const leftArm = this.createJointComposite(180, 200, 30, 100, [15, 15, 15, 15], group)
-		const rightLeg = this.createJointComposite(280, 345, 30, 100, [15, 15, 15, 15], group)
-		const leftLeg = this.createJointComposite(200, 340, 30, 100, [15, 15, 15, 15], group)
+		const body = this.createBodyComposite(280, 205, 100, 160, [30, 30, 50, 50], group)
+		const rightArm = this.createJointComposite(340, 200, 30, 100, [15, 15, 15, 15], group)
+		const leftArm = this.createJointComposite(220, 200, 30, 100, [15, 15, 15, 15], group)
+		const rightLeg = this.createJointComposite(320, 345, 30, 100, [15, 15, 15, 15], group)
+		const leftLeg = this.createJointComposite(240, 340, 30, 100, [15, 15, 15, 15], group)
 		return [head, body, rightArm, leftArm, rightLeg, leftLeg]
 	}
 
@@ -113,12 +113,12 @@ class MatterJSMediator {
 	 * @returns 
 	 */
 	createBodyComposite(x, y, w, h, radius, group) {
-		const part1 = this.Bodies.rectangle(x, y, w, h / 3, {
+		const part1 = this.Bodies.rectangle(x, y, w, h, {
 			collisionFilter: {
 				group: group
 			},
 			chamfer: {
-				radius: [10, 10, 35, 35]
+				radius: radius
 			},
 			frictionAir: 1,
 			render: {
@@ -126,52 +126,19 @@ class MatterJSMediator {
 				lineWidth: 1
 			}
 		})
-		const part2 = this.Bodies.rectangle(x, y, w * 8 / 11, h / 3, {
-			collisionFilter: {
-				group: group
-			},
-			chamfer: {
-				radius: [10, 10, 10, 10]
-			},
-			frictionAir: 1,
-			render: {
-				fillStyle: '#00B06B',
-				lineWidth: 1
-			}
-		})
-		const part3 = this.Bodies.rectangle(x, y, w, h / 3, {
-			collisionFilter: {
-				group: group
-			},
-			chamfer: {
-				radius: [35, 35, 10, 10]
-			},
-			frictionAir: 1,
-			render: {
-				fillStyle: '#00B06B',
-				lineWidth: 1
-			}
-		})
+
 
 		//グループ化
 		const composite = this.Composite.create({
-			bodies: [part1, part2, part3]
+			bodies: [part1]
 		})
 
-		//結合
-		this.Composites.chain(composite, 0, 0.35, 0, -0.35, {
-			stiffness: 1,
-			length: 1,
-			angularStiffness: 0.2,
-			render: {
-				strokeStyle: '#4a485b'
-			}
-		})
+
 		this.Composite.add(composite, this.Constraint.create({
 			bodyB: composite.bodies[0],
 			pointB: {
 				x: 0,
-				y: -1 * w / 6
+				y: -1 * h / 3
 			},
 			pointA: {
 				x: composite.bodies[0].position.x - 0.45 * 100,
