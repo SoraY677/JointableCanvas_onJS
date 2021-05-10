@@ -148,7 +148,8 @@ class MatterJSMediator {
 			length: 0.1,
 			render: {
 				fillStyle: '#00B06B',
-				strokeStyle: '#4a485b'
+				strokeStyle: '#4a485b',
+				visible: false
 			}
 		}))
 		return composite
@@ -166,7 +167,7 @@ class MatterJSMediator {
 			frictionAir: 1,
 			render: {
 				fillStyle: '#00B06B',
-				lineWidth: 1
+				lineWidth: 0
 			}
 		})
 		//第二関節
@@ -180,7 +181,7 @@ class MatterJSMediator {
 			frictionAir: 0.2,
 			render: {
 				fillStyle: '#00B06B',
-				lineWidth: 1
+				lineWidth: 0
 			}
 		})
 		//グループ化
@@ -193,9 +194,12 @@ class MatterJSMediator {
 			length: 1,
 			angularStiffness: 0.2,
 			render: {
-				strokeStyle: '#4a485b'
+				strokeStyle: '#4a485b',
+				lineWidth: 10,
+				visible: false
 			}
 		})
+		console.log(this.Composites.chain)
 		//固定化
 		this.Composite.add(parts, this.Constraint.create({
 			bodyB: parts.bodies[0],
@@ -210,7 +214,8 @@ class MatterJSMediator {
 			stiffness: 1,
 			length: 1,
 			render: {
-				strokeStyle: '#4a485b'
+				strokeStyle: '#4a485b',
+				visible: false
 			}
 		}))
 
