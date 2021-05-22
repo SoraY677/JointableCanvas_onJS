@@ -32,7 +32,6 @@ class MatterJSMediator {
 			options: {
 				wireframes: false, //ワイヤーフレームモードをオフ
 				showAngleIndicator: false,
-				background: 'transparent'
 			}
 		});
 
@@ -85,10 +84,10 @@ class MatterJSMediator {
 		const group = this.Body.nextGroup(true)
 
 		const head = this.Bodies.circle(235, 130, 40, {
-			isStatic: true,
 			collisionFilter: {
 				group: group
 			},
+			frictionAir: 1,
 			render: {
 				fillStyle: '#00B06B',
 				lineWidth: 1
@@ -99,7 +98,64 @@ class MatterJSMediator {
 		const leftArm = this.createJointComposite(220, 200, 30, 100, [15, 15, 15, 15], group)
 		const rightLeg = this.createJointComposite(320, 345, 30, 100, [15, 15, 15, 15], group)
 		const leftLeg = this.createJointComposite(240, 340, 30, 100, [15, 15, 15, 15], group)
-		return [head, body, rightArm, leftArm, rightLeg, leftLeg]
+
+		//グループ化
+		// this.Composite.add(composite, [hComposite, body])
+
+		// this.Composites.chain(composite, 0, 1, 0, -1, {
+		// 	stiffness: 1,
+		// 	length: 1,
+		// 	angularStiffness: 0.2,
+		// 	render: {
+		// 		strokeStyle: '#4a485b',
+		// 		lineWidth: 10,
+		// 		visible: false
+		// 	}
+		// })
+
+		let composite = this.Composite.create({
+			label: 'joint-man'
+		})
+
+		const joint = this.Constraint.create({
+			bodyB: body,
+			pointB: {
+				x: 0,
+				y: -100
+			},
+			bodyA: head,
+			stiffness: 1,
+			length: 0
+		})
+
+
+		this.Composite.addBody(composite, body);
+		this.Composite.addBody(composite, head);
+
+		composite = this.Composite.add(composite,
+			[rightArm, leftArm]
+		)
+		console.log(composite)
+		// this.Composite.addBody(composite, leftArm);
+		// this.Composite.addBody(composite, rightLeg);
+		// this.Composite.addBody(composite, leftLeg);
+		this.Composite.addConstraint(composite, joint);
+		// this.Composites.chain(composite, 0, 0.35, 0, -0.35, {
+		// 	stiffness: 1,
+		// 	length: 1,
+		// 	angularStiffness: 0.2,
+		// 	render: {
+		// 		strokeStyle: '#4a485b',
+		// 		lineWidth: 10,
+		// 		visible: false
+		// 	}
+		// })
+		// this.Composite.create({
+		// 	bodies: [body],
+		// 	composites: [rightArm]
+		// })
+
+		return [composite, rightArm, leftArm, rightLeg, leftLeg]
 	}
 
 	/**
@@ -128,31 +184,31 @@ class MatterJSMediator {
 		})
 
 
-		//グループ化
-		const composite = this.Composite.create({
-			bodies: [part1]
-		})
+		// //グループ化
+		// const composite = this.Composite.create({
+		// 	bodies: [part1]
+		// })
 
 
-		this.Composite.add(composite, this.Constraint.create({
-			bodyB: composite.bodies[0],
-			pointB: {
-				x: 0,
-				y: -1 * h / 3
-			},
-			pointA: {
-				x: composite.bodies[0].position.x - 0.45 * 100,
-				y: composite.bodies[0].position.y
-			},
-			stiffness: 1,
-			length: 0.1,
-			render: {
-				fillStyle: '#00B06B',
-				strokeStyle: '#4a485b',
-				visible: false
-			}
-		}))
-		return composite
+		// this.Composite.add(composite, this.Constraint.create({
+		// 	bodyB: composite.bodies[0],
+		// 	pointB: {
+		// 		x: 0,
+		// 		y: -1 * h / 3
+		// 	},
+		// 	pointA: {
+		// 		x: composite.bodies[0].position.x - 0.45 * 100,
+		// 		y: composite.bodies[0].position.y
+		// 	},
+		// 	stiffness: 1,
+		// 	length: 0.1,
+		// 	render: {
+		// 		fillStyle: '#00B06B',
+		// 		strokeStyle: '#4a485b',
+		// 		visible: false
+		// 	}
+		// }))
+		return part1
 	}
 
 	createJointComposite(x, y, w, h, radius, group) {
@@ -188,6 +244,7 @@ class MatterJSMediator {
 		const parts = this.Composite.create({
 			bodies: [parts1, parts2]
 		})
+		// console.log(parts)
 		//結合
 		this.Composites.chain(parts, 0, 0.35, 0, -0.35, {
 			stiffness: 1,
@@ -199,24 +256,6 @@ class MatterJSMediator {
 				visible: false
 			}
 		})
-		//固定化
-		this.Composite.add(parts, this.Constraint.create({
-			bodyB: parts.bodies[0],
-			pointB: {
-				x: 0,
-				y: -1 * h / 2 + 10
-			},
-			pointA: {
-				x: parts.bodies[0].position.x - 0.45 * 100,
-				y: parts.bodies[0].position.y
-			},
-			stiffness: 1,
-			length: 1,
-			render: {
-				strokeStyle: '#4a485b',
-				visible: false
-			}
-		}))
 
 		return parts
 	}
