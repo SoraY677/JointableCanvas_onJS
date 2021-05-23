@@ -1,34 +1,39 @@
 /**
  * Matter-JSの機能を仲介する拡張スクリプト
+ * 主にMatter-JSの基本となるセッティングを行う
  * doc:[https://brm.io/matter-js/docs/]
  */
-class MatterJSMediator {
-	// module aliases
-	Engine = Matter.Engine
-	Render = Matter.Render
-	Runner = Matter.Runner
-	Body = Matter.Body
-	Bodies = Matter.Bodies
-	MouseConstraint = Matter.MouseConstraint
-	Mouse = Matter.Mouse
-	Composite = Matter.Composite
-	Composites = Matter.Composites
-	Constraint = Matter.Constraint
+import Matter from 'matter-js';
+
+// module aliases
+export const Engine = Matter.Engine
+export const Render = Matter.Render
+export const Runner = Matter.Runner
+export const Body = Matter.Body
+export const Bodies = Matter.Bodies
+export const MouseConstraint = Matter.MouseConstraint
+export const Mouse = Matter.Mouse
+export const Composite = Matter.Composite
+export const Composites = Matter.Composites
+export const Constraint = Matter.Constraint
+
+export class MatterJSMediator {
 
 	/**
-	 * 
+	 * コンストラクタ
+	 * 詳細な処理はコード内を確認
 	 */
-	constructor() {
+	constructor(canvasId) {
 
-		// create an engine
-		const canvas = document.getElementById("main_canvas")
-		let engine = this.Engine.create()
-		let world = engine.world
+		// キャンバスを指定
+		this.canvas = document.getElementById(canvasId)
 
-		// create a renderer
-		let render = this.Render.create({
+		// 物理演算と描画
+		this.engine = Engine.create()
+		this.world = this.engine.world
+		this.render = Render.create({
 			element: document.body,
-			engine: engine,
+			engine: this.engine,
 			options: {
 				wireframes: false, //ワイヤーフレームモードをオフ
 				showAngleIndicator: false,
@@ -36,34 +41,57 @@ class MatterJSMediator {
 		});
 
 		// マウスコントロールのセッティング
-		render.mouse = this.getMouseControl(world, engine, render)
+		this.render.mouse = this.getMouseControl()
 
-		engine.gravity.scale = 0
-		// add all of the bodies to the world
+		this.engine.gravity.scale = 0 // 重力0
+
+
 		const jointMan = this.getJointMan()
 
-		this.Composite.add(engine.world, jointMan);
+		this.addNewComposite(jointMan);
+
+	}
+
+	addNewComposite(composite) {
+		// 配列の場合は随時チェックして追加
+		if (!!composite.length === true) {
+			for (let i in composite) {
+				if (isCompositeCheck(composite[i])) {
+					Composite.add(this.engine.world, composite[i]);
+				} else {
+					throw 'try add composite , found not composite!'
+				}
+			}
+		}
+		//単体の場合はチェック後に追加 
+		else if (isCompositeCheck(composite)) {
+			Composite.add(this.engine.world, composite)
+		}
+		//Error 
+		else {
+			throw 'try add composite , found not composite!'
+		}
+		return true
+	}
+
+	/**
+	 * 物理演算と描画処理を実行
+	 */
+	run() {
 		// run the renderer
-		this.Render.run(render);
-
+		Render.run(this.render);
 		// create runner
-		var runner = this.Runner.create();
-
+		const runner = Runner.create();
 		// run the engine
-		this.Runner.run(runner, engine);
+		Runner.run(runner, this.engine);
 	}
 
 	/**
 	 * マウスコントロールを取得
-	 * @param {*} world 
-	 * @param {*} engine 
-	 * @param {*} render 
-	 * @returns 
 	 */
-	getMouseControl(world, engine, render) {
-		// add mouse control
-		let mouse = this.Mouse.create(render.canvas)
-		let mouseConstraint = this.MouseConstraint.create(engine, {
+	getMouseControl() {
+		const mouse = Mouse.create(this.render.canvas)
+		const mouseConstraint = MouseConstraint.create(this.engine, {
 			mouse: mouse,
 			constraint: {
 				stiffness: 0.2,
@@ -72,7 +100,7 @@ class MatterJSMediator {
 				}
 			}
 		});
-		this.Composite.add(world, mouseConstraint);
+		Composite.add(this.world, mouseConstraint);
 		return mouse
 	}
 
@@ -81,9 +109,9 @@ class MatterJSMediator {
 	 * @returns {array} 
 	 */
 	getJointMan() {
-		const group = this.Body.nextGroup(true)
+		const group = Body.nextGroup(true)
 
-		const head = this.Bodies.circle(235, 130, 40, {
+		const head = Bodies.circle(235, 130, 40, {
 			collisionFilter: {
 				group: group
 			},
@@ -100,9 +128,9 @@ class MatterJSMediator {
 		const leftLeg = this.createJointComposite(240, 340, 30, 100, [15, 15, 15, 15], group)
 
 		//グループ化
-		// this.Composite.add(composite, [hComposite, body])
+		// Composite.add(composite, [hComposite, body])
 
-		// this.Composites.chain(composite, 0, 1, 0, -1, {
+		// Composites.chain(composite, 0, 1, 0, -1, {
 		// 	stiffness: 1,
 		// 	length: 1,
 		// 	angularStiffness: 0.2,
@@ -113,11 +141,11 @@ class MatterJSMediator {
 		// 	}
 		// })
 
-		let composite = this.Composite.create({
+		let composite = Composite.create({
 			label: 'joint-man'
 		})
 
-		const joint = this.Constraint.create({
+		const joint = Constraint.create({
 			bodyB: body,
 			pointB: {
 				x: 0,
@@ -129,18 +157,17 @@ class MatterJSMediator {
 		})
 
 
-		this.Composite.addBody(composite, body);
-		this.Composite.addBody(composite, head);
+		Composite.addBody(composite, body);
+		Composite.addBody(composite, head);
 
-		composite = this.Composite.add(composite,
+		composite = Composite.add(composite,
 			[rightArm, leftArm]
 		)
-		console.log(composite)
-		// this.Composite.addBody(composite, leftArm);
-		// this.Composite.addBody(composite, rightLeg);
-		// this.Composite.addBody(composite, leftLeg);
-		this.Composite.addConstraint(composite, joint);
-		// this.Composites.chain(composite, 0, 0.35, 0, -0.35, {
+		// Composite.addBody(composite, leftArm);
+		// Composite.addBody(composite, rightLeg);
+		// Composite.addBody(composite, leftLeg);
+		Composite.addConstraint(composite, joint);
+		// Composites.chain(composite, 0, 0.35, 0, -0.35, {
 		// 	stiffness: 1,
 		// 	length: 1,
 		// 	angularStiffness: 0.2,
@@ -150,12 +177,12 @@ class MatterJSMediator {
 		// 		visible: false
 		// 	}
 		// })
-		// this.Composite.create({
+		// Composite.create({
 		// 	bodies: [body],
 		// 	composites: [rightArm]
 		// })
 
-		return [composite, rightArm, leftArm, rightLeg, leftLeg]
+		return [composite]
 	}
 
 	/**
@@ -169,7 +196,7 @@ class MatterJSMediator {
 	 * @returns 
 	 */
 	createBodyComposite(x, y, w, h, radius, group) {
-		const part1 = this.Bodies.rectangle(x, y, w, h, {
+		const part1 = Bodies.rectangle(x, y, w, h, {
 			collisionFilter: {
 				group: group
 			},
@@ -185,12 +212,12 @@ class MatterJSMediator {
 
 
 		// //グループ化
-		// const composite = this.Composite.create({
+		// const composite = Composite.create({
 		// 	bodies: [part1]
 		// })
 
 
-		// this.Composite.add(composite, this.Constraint.create({
+		// Composite.add(composite, Constraint.create({
 		// 	bodyB: composite.bodies[0],
 		// 	pointB: {
 		// 		x: 0,
@@ -213,7 +240,7 @@ class MatterJSMediator {
 
 	createJointComposite(x, y, w, h, radius, group) {
 		//第一関節
-		const parts1 = this.Bodies.rectangle(x, y, w, h, {
+		const parts1 = Bodies.rectangle(x, y, w, h, {
 			collisionFilter: {
 				group: group
 			},
@@ -227,7 +254,7 @@ class MatterJSMediator {
 			}
 		})
 		//第二関節
-		const parts2 = this.Bodies.rectangle(x, y, w, h, {
+		const parts2 = Bodies.rectangle(x, y, w, h, {
 			collisionFilter: {
 				group: group
 			},
@@ -241,12 +268,11 @@ class MatterJSMediator {
 			}
 		})
 		//グループ化
-		const parts = this.Composite.create({
+		const parts = Composite.create({
 			bodies: [parts1, parts2]
 		})
-		// console.log(parts)
 		//結合
-		this.Composites.chain(parts, 0, 0.35, 0, -0.35, {
+		Composites.chain(parts, 0, 0.35, 0, -0.35, {
 			stiffness: 1,
 			length: 1,
 			angularStiffness: 0.2,
@@ -259,4 +285,13 @@ class MatterJSMediator {
 
 		return parts
 	}
+}
+
+/**
+ * Compositeのオブジェクトか調べる
+ * @param target 調査対象
+ */
+export function isCompositeCheck(target) {
+	if (typeof (target) === "object" && target.type == "composite") return true
+	else return false
 }

@@ -1,8 +1,13 @@
+import {
+	MatterJSMediator
+} from "./MatterJSMediator"
+
 window.onload = function () {
 
 
-	// let matterJSMediator = new JointMan()
-	console.log("dfsff")
+	const hoge = new MatterJSMediator()
+
+	hoge.run()
 
 
 }
