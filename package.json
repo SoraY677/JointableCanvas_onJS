@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/SoraY677/JointableCanvas_onJS#readme",
   "dependencies": {
+    "babel-loader": "^8.2.2",
+    "html-loader": "^2.1.2",
+    "html-webpack-plugin": "^5.3.1",
     "webpack": "^5.37.1"
   },
   "devDependencies": {
