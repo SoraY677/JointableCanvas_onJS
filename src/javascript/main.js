@@ -2,12 +2,20 @@ import {
 	MatterJSMediator
 } from "./MatterJSMediator"
 
+import {
+	JointMan
+} from "./JonitMan"
+
 window.onload = function () {
 
 
-	const hoge = new MatterJSMediator()
+	const matterJSMgr = new MatterJSMediator()
 
-	hoge.run()
+	const jointMan = new JointMan()
+	jointMan.createJointMan()
+	// matterJSMgr.addNewComposite(jointMan.createJointMan)
+
+	matterJSMgr.run()
 
 
 }
