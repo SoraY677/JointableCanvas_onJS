@@ -267,7 +267,7 @@ export class JointMan {
 			frictionAir: 1,
 			render: {
 				fillStyle: '#00B06B',
-				lineWidth: 1
+				// lineWidth: 1
 			}
 		})
 	}
