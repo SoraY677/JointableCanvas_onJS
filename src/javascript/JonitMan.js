@@ -12,6 +12,7 @@ import {
 export class JointMan {
 
 	constructor() {
+		// 各座標とサイズ等の設定
 		this.headConfig = {
 			x: 235,
 			y: 130,
@@ -21,11 +22,11 @@ export class JointMan {
 		this.bodyConfig = {
 			x: 280,
 			y: 205,
-			h: 100,
-			w: 160,
+			h: 160,
+			w: 100,
 			r: [30, 30, 50, 50]
 		}
-		this.jointConfig = {
+		this.partConfig = {
 			parts: {
 				ra1: {
 					x: 340,
@@ -33,7 +34,7 @@ export class JointMan {
 				},
 				ra2: {
 					x: 340,
-					y: 200
+					y: 200 + 60
 				},
 				la1: {
 					x: 220,
@@ -41,32 +42,156 @@ export class JointMan {
 				},
 				la2: {
 					x: 220,
-					y: 200
+					y: 200 + 60
 				},
 				rl1: {
 					x: 320,
-					l: 345
+					y: 345
 				},
 				rl2: {
 					x: 320,
-					l: 345
+					y: 345 + 60
 				},
 				ll1: {
 					x: 240,
 					y: 340
 				},
-				ll1: {
+				ll2: {
 					x: 240,
-					y: 340
+					y: 340 + 60
 				}
 			},
-			h: 30,
-			w: 100,
+			h: 100,
+			w: 30,
 			r: [15, 15, 15, 15]
 		}
+
+		// 各パーツの接合部分の設定
+		this.jointConfig = [
+			// head - body
+			{
+				bodyA: 'head',
+				pointA: {
+					x: 0,
+					y: this.headConfig.s * 1.2
+				},
+				bodyB: 'body',
+				pointB: {
+					x: 0,
+					y: -1 * this.bodyConfig.h / 2
+				}
+			},
+			// body - leftarm1
+			{
+				bodyA: 'body',
+				pointA: {
+					x: -1 * this.bodyConfig.w / 2 * 1.01,
+					y: -1 * this.bodyConfig.h / 2
+				},
+				bodyB: 'la1',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 2
+				}
+			},
+			// leftarm1 - leftarm2
+			{
+				bodyA: 'la1',
+				pointA: {
+					x: 0,
+					y: this.partConfig.h / 3
+				},
+				bodyB: 'la2',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 3
+				}
+			},
+			// body - rightarm1
+			{
+				bodyA: 'body',
+				pointA: {
+					x: this.bodyConfig.w / 2 * 1.01,
+					y: -1 * this.bodyConfig.h / 2
+				},
+				bodyB: 'ra1',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 2
+				}
+			},
+			// rightarm1 - rightarm2
+			{
+				bodyA: 'ra1',
+				pointA: {
+					x: 0,
+					y: this.partConfig.h / 3
+				},
+				bodyB: 'ra2',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 3
+				}
+			},
+			// body - leftleg1
+			{
+				bodyA: 'body',
+				pointA: {
+					x: -1 * this.bodyConfig.w / 2 * 1.01,
+					y: this.bodyConfig.h / 2 * 0.7
+				},
+				bodyB: 'll1',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 2
+				}
+			},
+			// leftleg1 - leftleg2
+			{
+				bodyA: 'll1',
+				pointA: {
+					x: 0,
+					y: this.partConfig.h / 3
+				},
+				bodyB: 'll2',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 3
+				}
+			},
+			// body - rightleg1
+			{
+				bodyA: 'body',
+				pointA: {
+					x: this.bodyConfig.w / 2 * 1.01,
+					y: this.bodyConfig.h / 2 * 0.7
+				},
+				bodyB: 'rl1',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 2
+				}
+			},
+			// rightleg1 - rightleg2
+			{
+				bodyA: 'rl1',
+				pointA: {
+					x: 0,
+					y: this.partConfig.h / 3
+				},
+				bodyB: 'rl2',
+				pointB: {
+					x: 0,
+					y: -1 * this.partConfig.h / 3
+				}
+			},
+		]
 	}
 
-
+	/**
+	 * 関節ふにゃふにゃの男を誕生させる
+	 * @returns {Matter.Composite}
+	 */
 	createJointMan() {
 		// 干渉しないように設定する設定
 		const group = Body.nextGroup(true)
@@ -75,16 +200,29 @@ export class JointMan {
 		const parts = {}
 		parts['head'] = this.createCircle(this.headConfig.x, this.headConfig.y, this.headConfig.s, group)
 		parts['body'] = this.createBlock(this.bodyConfig.x, this.bodyConfig.y, this.bodyConfig.w, this.bodyConfig.h, this.bodyConfig.r, group)
-		for (const key in this.jointConfig.parts) {
-			parts[key] = this.createBlock(this.jointConfig.parts[key].x, this.jointConfig.parts[key].y, this.jointConfig.w, this.jointConfig.h, this.jointConfig.r, group)
+		for (const key in this.partConfig.parts) {
+			parts[key] = this.createBlock(this.partConfig.parts[key].x, this.partConfig.parts[key].y, this.partConfig.w, this.partConfig.h, this.partConfig.r, group)
 		}
 
-		const composite = Composite.create({
-			bodies: [parts['head']]
-		})
-
-
-
+		const composite = Composite.create()
+		// 各パーツを追加
+		for (const key in parts) Composite.add(composite, parts[key])
+		// 接続設定を追加
+		for (let i in this.jointConfig) {
+			const config = this.jointConfig[i]
+			const constraint = Constraint.create({
+				bodyA: parts[config.bodyA],
+				pointA: config.pointA,
+				bodyB: parts[config.bodyB],
+				pointB: config.pointB,
+				stiffness: 0,
+				length: 0,
+				render: {
+					visible: false
+				}
+			})
+			Composite.addConstraint(composite, constraint);
+		}
 		return composite
 
 	}
@@ -99,9 +237,6 @@ export class JointMan {
 	 */
 	createCircle(x, y, s, group) {
 		return Bodies.circle(x, y, s, {
-			collisionFilter: {
-				group: group
-			},
 			frictionAir: 1,
 			render: {
 				fillStyle: '#00B06B',
@@ -135,76 +270,6 @@ export class JointMan {
 				lineWidth: 1
 			}
 		})
-	}
-
-
-
-	/**
-	 * 全パーツを設定し、取得する
-	 * @returns {array} 
-	 */
-	getJointMan() {
-
-
-		const joint = Constraint.create({
-			bodyB: body,
-			pointB: {
-				x: 0,
-				y: -100
-			},
-			bodyA: head,
-			stiffness: 1,
-			length: 0
-		})
-
-
-		Composite.addBody(composite, body);
-		Composite.addBody(composite, head);
-
-		composite = Composite.add(composite,
-			[rightArm, leftArm]
-		)
-		// Composite.addBody(composite, leftArm);
-		// Composite.addBody(composite, rightLeg);
-		// Composite.addBody(composite, leftLeg);
-		Composite.addConstraint(composite, joint);
-		// Composites.chain(composite, 0, 0.35, 0, -0.35, {
-		// 	stiffness: 1,
-		// 	length: 1,
-		// 	angularStiffness: 0.2,
-		// 	render: {
-		// 		strokeStyle: '#4a485b',
-		// 		lineWidth: 10,
-		// 		visible: false
-		// 	}
-		// })
-		// Composite.create({
-		// 	bodies: [body],
-		// 	composites: [rightArm]
-		// })
-
-		return [composite]
-	}
-
-	createJointComposite(x, y, w, h, radius, group) {
-
-		//グループ化
-		const parts = Composite.create({
-			bodies: [parts1, parts2]
-		})
-		//結合
-		Composites.chain(parts, 0, 0.35, 0, -0.35, {
-			stiffness: 1,
-			length: 1,
-			angularStiffness: 0.2,
-			render: {
-				strokeStyle: '#4a485b',
-				lineWidth: 10,
-				visible: false
-			}
-		})
-
-		return parts
 	}
 
 }
