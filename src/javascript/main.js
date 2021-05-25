@@ -11,9 +11,8 @@ window.onload = function () {
 
 	const matterJSMgr = new MatterJSMediator()
 
-	const jointMan = new JointMan()
-	jointMan.createJointMan()
-	// matterJSMgr.addNewComposite(jointMan.createJointMan)
+	const jointMan = (new JointMan()).createJointMan()
+	matterJSMgr.addNewComposite(jointMan)
 
 	matterJSMgr.run()
 

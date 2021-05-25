@@ -76,15 +76,16 @@ export class JointMan {
 		parts['head'] = this.createCircle(this.headConfig.x, this.headConfig.y, this.headConfig.s, group)
 		parts['body'] = this.createBlock(this.bodyConfig.x, this.bodyConfig.y, this.bodyConfig.w, this.bodyConfig.h, this.bodyConfig.r, group)
 		for (const key in this.jointConfig.parts) {
-			console.log(key)
 			parts[key] = this.createBlock(this.jointConfig.parts[key].x, this.jointConfig.parts[key].y, this.jointConfig.w, this.jointConfig.h, this.jointConfig.r, group)
 		}
 
-		console.log(parts)
+		const composite = Composite.create({
+			bodies: [parts['head']]
+		})
 
 
 
-		return []
+		return composite
 
 	}
 
@@ -97,7 +98,7 @@ export class JointMan {
 	 * @returns 
 	 */
 	createCircle(x, y, s, group) {
-		const body = Bodies.circle(x, y, s, {
+		return Bodies.circle(x, y, s, {
 			collisionFilter: {
 				group: group
 			},
@@ -108,8 +109,6 @@ export class JointMan {
 			}
 		})
 
-		console.log(body)
-		return body
 	}
 
 	/**
@@ -186,88 +185,9 @@ export class JointMan {
 
 		return [composite]
 	}
-	/**
-	 * 
-	 * @param {*} x 
-	 * @param {*} y 
-	 * @param {*} w 
-	 * @param {*} h 
-	 * @param {*} radius 
-	 * @param {*} group 
-	 * @returns 
-	 */
-	createBodyComposite(x, y, w, h, radius, group) {
-		const part1 = Bodies.rectangle(x, y, w, h, {
-			collisionFilter: {
-				group: group
-			},
-			chamfer: {
-				radius: radius
-			},
-			frictionAir: 1,
-			render: {
-				fillStyle: '#00B06B',
-				lineWidth: 1
-			}
-		})
-
-
-		// //グループ化
-		// const composite = Composite.create({
-		// 	bodies: [part1]
-		// })
-
-
-		// Composite.add(composite, Constraint.create({
-		// 	bodyB: composite.bodies[0],
-		// 	pointB: {
-		// 		x: 0,
-		// 		y: -1 * h / 3
-		// 	},
-		// 	pointA: {
-		// 		x: composite.bodies[0].position.x - 0.45 * 100,
-		// 		y: composite.bodies[0].position.y
-		// 	},
-		// 	stiffness: 1,
-		// 	length: 0.1,
-		// 	render: {
-		// 		fillStyle: '#00B06B',
-		// 		strokeStyle: '#4a485b',
-		// 		visible: false
-		// 	}
-		// }))
-		return part1
-	}
 
 	createJointComposite(x, y, w, h, radius, group) {
-		//第一関節
-		const parts1 = Bodies.rectangle(x, y, w, h, {
-			collisionFilter: {
-				group: group
-			},
-			chamfer: {
-				radius: radius
-			},
-			frictionAir: 1,
-			render: {
-				fillStyle: '#00B06B',
-				lineWidth: 0
-			}
-		})
-		//第二関節
-		const parts2 = Bodies.rectangle(x, y, w, h, {
-			collisionFilter: {
-				group: group
-			},
-			chamfer: {
-				radius: radius
-			},
-			frictionAir: 0.2,
-			render: {
-				fillStyle: '#00B06B',
-				lineWidth: 0
-			}
-		})
+
 		//グループ化
 		const parts = Composite.create({
 			bodies: [parts1, parts2]
