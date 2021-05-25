@@ -37,6 +37,7 @@ export class MatterJSMediator {
 			options: {
 				wireframes: false, //ワイヤーフレームモードをオフ
 				showAngleIndicator: false,
+				background: 'transparent',
 			}
 		});
 
