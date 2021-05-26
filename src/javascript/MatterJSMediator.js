@@ -25,14 +25,11 @@ export class MatterJSMediator {
 	 */
 	constructor(canvasId) {
 
-		// キャンバスを指定
-		this.canvas = document.getElementById(canvasId)
-
 		// 物理演算と描画
 		this.engine = Engine.create()
 		this.world = this.engine.world
 		this.render = Render.create({
-			element: document.body,
+			canvas: document.getElementById(canvasId),
 			engine: this.engine,
 			options: {
 				wireframes: false, //ワイヤーフレームモードをオフ
@@ -45,12 +42,6 @@ export class MatterJSMediator {
 		this.render.mouse = this.getMouseControl()
 
 		this.engine.gravity.scale = 0 // 重力0
-
-
-		// const jointMan = this.getJointMan()
-
-		// this.addNewComposite(jointMan);
-
 	}
 
 	addNewComposite(composite) {
