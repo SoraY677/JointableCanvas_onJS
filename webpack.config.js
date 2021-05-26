@@ -12,7 +12,6 @@ module.exports = {
 		filename: 'bundle.js',
 		// 出力先のパス（絶対パスを指定する必要がある）
 		path: path.join(__dirname, 'dist'),
-		// publicPath: path.join(__dirname, 'dist')
 	},
 	devServer: {
 		open: true,
@@ -35,6 +34,8 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new HtmlWebpackPlugin()
+		new HtmlWebpackPlugin({
+			template: path.join(__dirname, 'src', 'html', 'index.html')
+		})
 	]
 };
