@@ -1,0 +1,25 @@
+#main_frame {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+}
+
+#main_canvas_container {
+	max-width: 50%
+}
+
+#main_canvas_container>canvas {
+	width: 100%;
+	height: 100%;
+}
+
+#control_window_container {
+	width: 50%;
+	padding: 10px;
+	/* background-color: #2e2e2e; */
+}
+
+#control_window {
+	padding: 1em;
+}
