@@ -17,6 +17,7 @@ window.onload = function () {
 	matterJSMgr.addNewComposite(jointMan)
 
 	matterJSMgr.run()
+	console.log("hogehgo")
 
 
 }
