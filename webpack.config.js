@@ -30,9 +30,22 @@ module.exports = {
 			{
 				test: /\.html$/,
 				loader: "html-loader"
+			},
+			{
+				test: /\.css/,
+				use: [
+					"style-loader",
+					{
+						loader: "css-loader",
+						options: {
+							url: false
+						}
+					}
+				]
 			}
 		]
 	},
+	target: ["web", "es5"],
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: path.join(__dirname, 'src', 'html', 'index.html')
