@@ -7,6 +7,77 @@
     <title>Joint on JS</title>
   </head>
   <body>
-    <canvas id="main_canvas"></canvas>
+    <div id="main_frame">
+      <!-- 左キャンバス -->
+      <div id="main_canvas_container">
+        <canvas id="main_canvas"></canvas>
+      </div>
+      <!-- 操作パネル -->
+      <div id="control_window_container">
+        <div id="control_window" class="card">
+          <!-- 統一職を変えるボタン -->
+          <div>
+            <p>
+              <label>
+                <input type="checkbox" />
+                <span>change unified-color</span>
+              </label>
+            </p>
+            <p>■ #BBBBBB</p>
+          </div>
+          <!-- オブジェクト管理 -->
+          <div id="object_controll-container">
+            <button>＋ Add object</button>
+            <div>
+              <ul>
+                <li>
+                  <label>
+                    <input type="radio" />
+                    オブジェクト①
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" />
+                    オブジェクト②
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- 個体の編集 -->
+          <div id="single-controll-container">
+            <div>
+              <p>
+                <label>
+                  <input type="check" />
+                  <span>change unified-color</span>
+                </label>
+              </p>
+              <p>■ #BBBBBB</p>
+            </div>
+            <div>
+              <p>
+                <label>
+                  <input type="check" />
+                  <span>scale</span>
+                </label>
+              </p>
+              <input type="text" />
+            </div>
+          </div>
+          <!-- download -->
+          <div id="download-container">
+            <p>download</p>
+            <ul>
+              <li><button>JPEG</button></li>
+              <li><button>PNG</button></li>
+              <li><button>SVG</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!--  -->
+    </div>
   </body>
 </html>
