@@ -1,3 +1,5 @@
+import "../css/style.css";
+
 import {
 	MatterJSMediator
 } from "./MatterJSMediator"
